@@ -1,0 +1,13 @@
+{
+  "name": "react-wp-shortcode",
+  "version": "1.0.0",
+  "description": "A simple plugin to render a React app via a shortcode",
+  "scripts": {
+    "start": "wp-scripts start",
+    "build": "wp-scripts build"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@wordpress/scripts": "27.5.0"
+  }
+}
