@@ -20,7 +20,11 @@ export const useCbrRates = (codes: string[]) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const normalizedCodes = useMemo(() => Array.from(new Set(['RUB', ...codes])), [codes]);
+    // Убеждаемся, что codes - это валидный массив
+    const validCodes = Array.isArray(codes) && codes.length > 0 ? codes : ['RUB', 'USD', 'THB', 'EUR', 'AED', 'USDT'];
+    // Используем JSON.stringify для стабильного ключа мемоизации
+    const codesKey = JSON.stringify(validCodes.sort());
+    const normalizedCodes = useMemo(() => Array.from(new Set(['RUB', ...validCodes])), [codesKey]);
 
     useEffect(() => {
         let isMounted = true;
@@ -60,6 +64,8 @@ export const useCbrRates = (codes: string[]) => {
             } catch (err) {
                 if (isMounted) {
                     setError(err instanceof Error ? err.message : 'Ошибка загрузки курсов');
+                    // Даже при ошибке устанавливаем базовые курсы
+                    setRates({ RUB: 1 });
                 }
             } finally {
                 if (isMounted) {

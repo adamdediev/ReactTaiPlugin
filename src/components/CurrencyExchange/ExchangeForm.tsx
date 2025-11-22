@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, InputNumber, Select, Space } from 'antd';
 import CurrencyFlag from 'react-currency-flags';
-import { currencyOptions, currencyMeta } from './data';
+import { getCurrencyOptions, getCurrencyMeta } from './data';
 
 type ExchangeFormProps = {
     currency: string;
@@ -18,15 +18,27 @@ const ExchangeForm = ({
     onAmountChange,
     disabled,
 }: ExchangeFormProps) => {
+    const currencyOptions = getCurrencyOptions();
+    const currencyMetaData = getCurrencyMeta();
+    
     const optionsWithFlags = currencyOptions.map((option) => {
-        const meta = currencyMeta[option.value];
+        const meta = currencyMetaData[option.value];
+        
         return {
             value: option.value,
             label: (
                 <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    {option.value === 'USDT' ? (
+                    {/* Если есть URL иконки, используем её */}
+                    {meta?.icon ? (
+                        <img 
+                            src={meta.icon} 
+                            alt={option.value}
+                            className="exchange-form__flag-icon"
+                            style={{ width: '30px', height: '30px', borderRadius: '50%', objectFit: 'cover' }}
+                        />
+                    ) : meta?.isCrypto && meta?.flag ? (
                         <span style={{ fontSize: '24px', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', overflow: 'hidden' }}>
-                            {meta?.flag || '🪙'}
+                            {meta.flag}
                         </span>
                     ) : (
                         <CurrencyFlag 
@@ -65,7 +77,7 @@ const ExchangeForm = ({
                 />
             </Space.Compact>
             <Button type="primary" size="large" className="exchange-form__button" disabled={disabled}>
-                Рассчитать
+               Обменять
             </Button>
         </div>
     );

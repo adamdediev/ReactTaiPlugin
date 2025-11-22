@@ -1,8 +1,7 @@
 import React, { useMemo } from 'react';
 import { Button, Card, List, Skeleton, Typography } from 'antd';
 import CurrencyFlag from 'react-currency-flags';
-import * as TokenIcons from '@token-icons/react';
-import { currencyMeta, payoutCurrencyCodes } from './data';
+import { currencyMeta, getPayoutCurrencyCodes, getCurrencyMeta } from './data';
 import DynamicClock from '../DynamicClock/DynamicClock';
 
 const largeNumberFormatter = new Intl.NumberFormat('ru-RU', {
@@ -17,12 +16,6 @@ const preciseNumberFormatter = new Intl.NumberFormat('ru-RU', {
 const formatAmount = (value: number) =>
     value >= 100 ? largeNumberFormatter.format(value) : preciseNumberFormatter.format(value);
 
-// Функция для получения иконки токена
-const getTokenIcon = (code: string) => {
-    const iconName = `Token${code}` as keyof typeof TokenIcons;
-    return TokenIcons[iconName] as React.ReactNode || null;
-};
-
 type RatesBoardProps = {
     baseCurrency: string;
     baseAmount: number;
@@ -33,20 +26,42 @@ type RatesBoardProps = {
 
 const RatesBoard = ({ baseCurrency, baseAmount, rates, loading, error }: RatesBoardProps) => {
     const conversions = useMemo(() => {
-        const baseRate = rates[baseCurrency];
-        if (!baseRate) return [];
-
+        const baseRate = rates[baseCurrency] || 1; // Если курс не найден, используем 1
         const amountInRub = baseAmount * baseRate;
+        const payoutCodes = getPayoutCurrencyCodes();
+        const currencyMetaData = getCurrencyMeta();
+        
+        // Если нет валют для отображения, возвращаем пустой массив
+        if (payoutCodes.length === 0) {
+            return [];
+        }
 
-        return payoutCurrencyCodes.map((code) => {
-            const targetRate = rates[code];
-            const meta = currencyMeta[code];
-            if (!targetRate || !meta) {
+        return payoutCodes.map((code) => {
+            const meta = currencyMetaData[code];
+            if (!meta) {
                 return {
                     code,
-                    flag: meta?.flag || '',
-                    icon: meta?.icon,
-                    payoutMarkup: meta?.payoutMarkup || 0,
+                    flag: '',
+                    icon: undefined,
+                    payoutMarkup: 0,
+                    conversion: 'Нет данных',
+                    amount: 0,
+                    ready: false,
+                };
+            }
+
+            // Для криптовалют используем курс USD как fallback
+            let targetRate = rates[code];
+            if (!targetRate && meta.isCrypto && rates.USD) {
+                targetRate = rates.USD;
+            }
+
+            if (!targetRate) {
+                return {
+                    code: meta.code,
+                    flag: meta.flag,
+                    icon: meta.icon,
+                    payoutMarkup: meta.payoutMarkup,
                     conversion: 'Нет данных',
                     amount: 0,
                     ready: false,
@@ -87,24 +102,45 @@ const RatesBoard = ({ baseCurrency, baseAmount, rates, loading, error }: RatesBo
             </div>
             {loading ? (
                 <Skeleton active paragraph={{ rows: 5 }} title={false} className="rates-board__skeleton" />
-            ) : error ? (
-                <Typography.Text type="danger">{error}</Typography.Text>
             ) : (
-                <List
-                    dataSource={conversions}
-                    split={false}
-                    renderItem={(item) => (
+                <>
+                    {error && (
+                        <Typography.Text type="warning" style={{ display: 'block', marginBottom: '16px', padding: '0 24px' }}>
+                            {error}
+                        </Typography.Text>
+                    )}
+                    {conversions.length > 0 ? (
+                        <List
+                            dataSource={conversions}
+                            split={false}
+                            renderItem={(item) => (
                         <List.Item className="rates-board__item" key={item.code}>
                             <div className="rates-board__currency">
                                 <div className="rates-board__icon-wrapper">
                                     {(() => {
-                                        const meta = currencyMeta[item.code];
-                                        if (meta?.isCrypto) {
-                                            const TokenIcon = getTokenIcon(item.code);
-                                            if (TokenIcon) {
-                                                return <TokenIcon size={30} className="rates-board__crypto-icon" />;
-                                            }
+                                        const meta = getCurrencyMeta()[item.code];
+                                        
+                                        // Если есть URL иконки, используем её
+                                        if (meta?.icon) {
+                                            return (
+                                                <img 
+                                                    src={meta.icon} 
+                                                    alt={item.code}
+                                                    className="rates-board__custom-icon"
+                                                />
+                                            );
                                         }
+                                        
+                                        // Если это криптовалюта и есть флаг (эмодзи), показываем его
+                                        if (meta?.isCrypto && meta?.flag) {
+                                            return (
+                                                <span className="rates-board__crypto-emoji">
+                                                    {meta.flag}
+                                                </span>
+                                            );
+                                        }
+                                        
+                                        // Для обычных валют используем флаг
                                         return (
                                             <CurrencyFlag 
                                                 currency={item.code} 
@@ -130,7 +166,13 @@ const RatesBoard = ({ baseCurrency, baseAmount, rates, loading, error }: RatesBo
                             </div>
                         </List.Item>
                     )}
-                />
+                        />
+                    ) : (
+                        <Typography.Text type="secondary" style={{ display: 'block', padding: '24px', textAlign: 'center' }}>
+                            Нет доступных валют для отображения
+                        </Typography.Text>
+                    )}
+                </>
             )}
         </Card>
     );

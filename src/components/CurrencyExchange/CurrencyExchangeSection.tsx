@@ -2,13 +2,21 @@ import React, { useMemo, useState } from 'react';
 import { Typography } from 'antd';
 import ExchangeForm from './ExchangeForm';
 import RatesBoard from './RatesBoard';
-import { rateCurrencyCodes } from './data';
+import { getRateCurrencyCodes } from './data';
 import { useCbrRates } from '../../hooks/useCbrRates';
 
 const CurrencyExchangeSection = () => {
     const [currency, setCurrency] = useState('RUB');
     const [amount, setAmount] = useState(10000);
-    const { rates, loading, error } = useCbrRates(rateCurrencyCodes);
+    
+    // Используем useMemo чтобы не пересоздавать массив кодов при каждом рендере
+    // Используем стабильный массив базовых валют, чтобы избежать бесконечных перезагрузок
+    const rateCodes = React.useMemo(() => {
+        const codes = getRateCurrencyCodes();
+        // Всегда возвращаем хотя бы базовые валюты
+        return codes.length > 0 ? codes : ['RUB', 'USD', 'THB', 'EUR', 'AED', 'USDT'];
+    }, []);
+    const { rates, loading, error } = useCbrRates(rateCodes);
 
     const derivedRates = useMemo(() => {
         if (!rates.USDT && rates.USD) {

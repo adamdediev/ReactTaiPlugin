@@ -12,10 +12,10 @@ $border-card: rgba(255, 255, 255, 0.05);
 
 .currency-section {
     position: relative;
-    background-size: cover;
-    background-position: center;
+    background-size: 1300px;
+    background-position: right;
     background-image: url('./background.jpg');
-    border-radius: 36px;
+    background-repeat: no-repeat;
     overflow: hidden;
     min-height: 420px;
     color: $text-white;
@@ -38,12 +38,14 @@ $border-card: rgba(255, 255, 255, 0.05);
         display: flex;
         justify-content: space-between;
         gap: 32px;
-        padding: 90px 5%;
+        padding: 90px 0;
+        max-width: var(--container-max-width);
+        margin: 0 auto;
         align-items: center;
     }
 
     &__overlay {
-        background: linear-gradient(90deg, rgba(7, 7, 7, 0.92) 0%, rgba(7, 7, 7, 0.65) 45%, rgba(7, 7, 7, 0.4) 100%);
+        background: linear-gradient(90deg, rgba(7, 7, 7, 0.92) 0%, rgba(7, 7, 7, 0.2) 45%, rgba(7, 7, 7, 0.4) 100%);
         border-radius: inherit;
         width: 100%;
         height: 100%;
@@ -149,38 +151,58 @@ $border-card: rgba(255, 255, 255, 0.05);
 
             &.ant-select-open {
                 .ant-select-selector {
-                    border-color: transparent !important;
+                    border-right: 2px solid #2B2B2B !important;
                 }
             }
         }
 
         .ant-select-dropdown {
             background: #1a1a1a !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            border-radius: 12px !important;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            border-radius: 16px !important;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5) !important;
+            padding: 8px !important;
+            margin-top: 4px !important;
+            backdrop-filter: blur(10px) !important;
 
             .ant-select-item {
                 color: $text-white !important;
-                padding: 12px 20px !important;
+                padding: 14px 20px !important;
                 font-size: 16px !important;
+                border-radius: 10px !important;
+                margin-bottom: 4px !important;
+                transition: all 0.2s ease !important;
+                display: flex !important;
+                align-items: center !important;
+                gap: 12px !important;
+
+                &:last-child {
+                    margin-bottom: 0 !important;
+                }
 
                 .exchange-form__flag-icon {
-                    width: 40px !important;
-                    height: 40px !important;
+                    width: 32px !important;
+                    height: 32px !important;
                     background-position: center !important;
                     border-radius: 50% !important;
                     object-fit: cover !important;
+                    flex-shrink: 0 !important;
                 }
 
                 &:hover {
-                    background: rgba(255, 255, 255, 0.1) !important;
+                    background: rgba(255, 255, 255, 0.12) !important;
+                    transform: translateX(2px);
                 }
 
                 &.ant-select-item-option-selected {
-                    background: rgba(21, 149, 56, 0.2) !important;
+                    background: rgba(21, 149, 56, 0.25) !important;
                     color: $primary-green !important;
                     font-weight: 600;
+                    border: 1px solid rgba(21, 149, 56, 0.3) !important;
+                }
+
+                &.ant-select-item-option-active {
+                    background: rgba(255, 255, 255, 0.08) !important;
                 }
             }
         }
@@ -210,24 +232,52 @@ $border-card: rgba(255, 255, 255, 0.05);
     }
 
     &__button {
-        margin-top: 20px;
-        width: 100%;
-        border-radius: 80px;
-        background: $primary-green;
-        border: none;
-        font-weight: 500;
-        font-size: 1.5rem;
-        padding: 8px;
-        height: auto;
-        color: $text-white;
-        transition: all 0.3s ease;
+        margin-top: 20px !important;
+        width: 100% !important;
+        border-radius: 80px !important;
+        background: $primary-green !important;
+        border: none !important;
+        font-weight: 100 !important;
+        font-size: 1.5rem !important;
+        padding: 8px !important;   
+        height: auto !important;
+        color: $text-white !important;
+        transition: all 0.3s ease !important;
+        position: relative !important;
+        overflow: hidden !important;
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 0;
+        }
+
+        > * {
+            position: relative;
+            z-index: 1;
+        }
 
         &:hover {
-            opacity: 0.8;
+            background: rgba(21, 149, 56, 0.8) !important;
+            &::before {
+                opacity: 1;
+
+            }
         }
 
         &:active {
             transform: translateY(0);
+            
+            &::before {
+                opacity: 0.3;
+            }
         }
     }
 }
@@ -266,25 +316,28 @@ $border-card: rgba(255, 255, 255, 0.05);
 
     .ant-card-body {
         padding: 24px 0 !important;
-        max-height: 600px;
-        overflow-y: auto;
-        overflow-x: hidden;
         
-        &::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        &::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 3px;
-        }
-        
-        &::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 3px;
+        .ant-list-items {
+            max-height: 500px;
+            overflow-y: auto;
+            overflow-x: hidden;
             
-            &:hover {
-                background: rgba(255, 255, 255, 0.3);
+            &::-webkit-scrollbar {
+                width: 6px;
+            }
+            
+            &::-webkit-scrollbar-track {
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 3px;
+            }
+            
+            &::-webkit-scrollbar-thumb {
+                background: rgba(255, 255, 255, 0.2);
+                border-radius: 3px;
+                
+                &:hover {
+                    background: rgba(255, 255, 255, 0.3);
+                }
             }
         }
     }
@@ -387,16 +440,24 @@ $border-card: rgba(255, 255, 255, 0.05);
         object-fit: cover !important;
     }
 
-    &__crypto-icon {
+    &__custom-icon {
         width: 30px !important;
         height: 30px !important;
+        border-radius: 50% !important;
+        object-fit: cover !important;
         flex-shrink: 0;
-        
-        svg {
-            width: 100% !important;
-            height: 100% !important;
-            display: block;
-        }
+        display: block !important;
+    }
+
+    &__crypto-emoji {
+        width: 30px !important;
+        height: 30px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 24px !important;
+        line-height: 1 !important;
+        flex-shrink: 0;
     }
 
     &__icon {
@@ -422,9 +483,9 @@ $border-card: rgba(255, 255, 255, 0.05);
 
     &__code {
         color: $text-white;
-        font-weight: 600;
+        font-weight: 300;
         text-transform: uppercase;
-        font-size: 16px;
+        font-size: 20px;
         line-height: 1.4;
     }
 
@@ -442,22 +503,6 @@ $border-card: rgba(255, 255, 255, 0.05);
         text-align: right;
         line-height: 1.2;
     }
-
-    // &__action {
-    //     margin-top: 24px;
-    //     border-radius: 999px;
-    //     border: 1px solid rgba(255, 255, 255, 0.25);
-    //     background: transparent;
-    //     color: $text-white;
-    //     font-weight: 600;
-    //     height: 48px;
-    //     transition: all 0.3s ease;
-
-    //     &:hover {
-    //         background: rgba(255, 255, 255, 0.1);
-    //         border-color: rgba(255, 255, 255, 0.4);
-    //     }
-    // }
 
     &__skeleton {
         .ant-skeleton-content {
@@ -479,7 +524,7 @@ $border-card: rgba(255, 255, 255, 0.05);
     .currency-section {
         &__content {
             flex-direction: column;
-            padding: 48px 5%;
+            padding: 48px 0 !important;
             gap: 24px;
         }
 
