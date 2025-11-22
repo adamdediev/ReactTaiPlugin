@@ -1,1 +1,1 @@
-export * from './Counter';
+export { default as CurrencyExchangeSection } from './CurrencyExchange/CurrencyExchangeSection';

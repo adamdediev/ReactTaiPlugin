@@ -1,7 +1,7 @@
-import { Counter } from './components';
+import { CurrencyExchangeSection } from './components';
 
 export const App = () => (
     <>
-        <Counter />
+        <CurrencyExchangeSection />
     </>
 );
