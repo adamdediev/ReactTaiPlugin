@@ -102,7 +102,7 @@ const RatesBoard = ({ baseCurrency, baseAmount, rates, loading, error }: RatesBo
                                         if (meta?.isCrypto) {
                                             const TokenIcon = getTokenIcon(item.code);
                                             if (TokenIcon) {
-                                                return <TokenIcon size={30} className="rates-board__flag-icon" />;
+                                                return <TokenIcon size={30} className="rates-board__crypto-icon" />;
                                             }
                                         }
                                         return (

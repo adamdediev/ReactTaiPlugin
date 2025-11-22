@@ -256,13 +256,37 @@ $border-card: rgba(255, 255, 255, 0.05);
             linear-gradient(#fff 0 0) content-box,
             linear-gradient(#fff 0 0);
         -webkit-mask-composite: xor;
-                mask-composite: exclude;
+        mask:
+            linear-gradient(#fff 0 0) content-box,
+            linear-gradient(#fff 0 0);
+        mask-composite: exclude;
         z-index: -1;
     }
 
 
     .ant-card-body {
         padding: 24px 0 !important;
+        max-height: 600px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        
+        &::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        &::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+        
+        &::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            
+            &:hover {
+                background: rgba(255, 255, 255, 0.3);
+            }
+        }
     }
 
     &__header {
@@ -289,10 +313,11 @@ $border-card: rgba(255, 255, 255, 0.05);
     }
 
     &__item {
-        padding: 16px 24px !important;
+        margin: 0 24px !important;
+        padding: 16px 0 !important;
         transition: all 0.3s ease !important;
         border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
-        
+        position: relative;
 
         &:last-child {
             border-bottom: none !important;
@@ -301,10 +326,33 @@ $border-card: rgba(255, 255, 255, 0.05);
         .ant-list-item {
             padding: 0;
         }
-       &:hover {
-        background: linear-gradient(90deg, rgba(43, 43, 43, 0.60) 0%, rgba(256, 256, 256, 0.2) 50.48%, rgba(43, 43, 43, 0.60) 100%);
         
-            border-color: rgba(255, 255, 255, 0.4);
+        &::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, rgba(43, 43, 43, 0.60) 0%, rgba(256, 256, 256, 0.2) 50.48%, rgba(43, 43, 43, 0.60) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        &:hover {
+            &::before {
+                opacity: 1;
+            }
+            border-color: rgba(255, 255, 255, 0.4) !important;
+            margin: 0 !important;
+            padding: 16px 24px !important;
+        }
+        
+        > * {
+            position: relative;
+            z-index: 1;
         }
     }
 
@@ -337,6 +385,18 @@ $border-card: rgba(255, 255, 255, 0.05);
         background-position: center !important;
         border-radius: 50% !important;
         object-fit: cover !important;
+    }
+
+    &__crypto-icon {
+        width: 30px !important;
+        height: 30px !important;
+        flex-shrink: 0;
+        
+        svg {
+            width: 100% !important;
+            height: 100% !important;
+            display: block;
+        }
     }
 
     &__icon {
