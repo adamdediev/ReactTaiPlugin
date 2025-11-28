@@ -85,6 +85,12 @@ function dbt_currency_settings_page() {
 				}
 			}
 			
+			// Сохраняем URL кнопки обмена
+			if (isset($_POST['exchange_button_url'])) {
+				$exchange_url = esc_url_raw($_POST['exchange_button_url']);
+				update_option('dbt_exchange_button_url', $exchange_url);
+			}
+			
 			$result = update_option('dbt_custom_currencies', $currencies);
 			
 			$active_count = count(array_filter($currencies, function($c) { return !empty($c['active']); }));
@@ -101,6 +107,9 @@ function dbt_currency_settings_page() {
 		// Первая загрузка - получаем валюты из БД
 		$all_currencies = get_option('dbt_custom_currencies', $default_currencies);
 	}
+	
+	// Получаем URL кнопки обмена
+	$exchange_button_url = get_option('dbt_exchange_button_url', '');
 
 	?>
 	<div class="wrap">
@@ -190,6 +199,30 @@ function dbt_currency_settings_page() {
 					<span class="dashicons dashicons-plus-alt" style="margin-top: 4px;"></span> Добавить валюту
 				</button>
 			</p>
+			
+			<hr style="margin: 30px 0; border: none; border-top: 2px solid #ddd;">
+
+			<h2>🔗 Настройки кнопки обмена</h2>
+			<table class="form-table">
+				<tr>
+					<th scope="row">
+						<label for="exchange_button_url">URL для кнопки "Обменять"</label>
+					</th>
+					<td>
+						<input type="url" 
+							   name="exchange_button_url" 
+							   id="exchange_button_url" 
+							   value="<?php echo esc_attr($exchange_button_url); ?>" 
+							   class="regular-text" 
+							   placeholder="https://example.com/exchange"
+						/>
+						<p class="description">
+							Введите полную ссылку, куда будет вести кнопка "Обменять". 
+							Если оставить пустым, кнопка будет неактивной.
+						</p>
+					</td>
+				</tr>
+			</table>
 			
 			<?php submit_button('💾 Сохранить все изменения', 'primary large', 'dbt_save_currencies'); ?>
 		</form>
@@ -414,6 +447,7 @@ function dbt_render_react_wp_shortcode_app($atts) {
 	$data_to_pass_to_js = [
 		'containerID' => $containerID,
 		'customCurrencies' => $all_currencies,
+		'exchangeButtonUrl' => get_option('dbt_exchange_button_url', ''),
 	];
 
 	wp_localize_script("dbt-react-wp-shortcode-app-$escapedID", 'pluginData', $data_to_pass_to_js);

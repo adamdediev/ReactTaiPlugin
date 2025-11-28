@@ -72,12 +72,30 @@ const RatesBoard = ({ baseCurrency, baseAmount, rates, loading, error }: RatesBo
             const markupMultiplier = 1 + (meta.payoutMarkup / 100);
             const targetAmount = (amountInRub / targetRate) * markupMultiplier;
             
+            // Рассчитываем отображаемый курс в зависимости от базовой валюты
+            let displayRate: number;
+            let conversionString: string;
+            
+            if (baseCurrency === 'RUB') {
+                // Если базовая валюта RUB, показываем сколько рублей стоит 1 единица целевой валюты
+                // Применяем markup к курсу
+                displayRate = targetRate / markupMultiplier;
+                conversionString = `1 ${meta.code} = ${displayRate.toFixed(2)} RUB`;
+            } else {
+                // Если базовая валюта не RUB, показываем кросс-курс
+                // Например: 1 USD = X THB
+                // Формула: (курс базовой валюты в рублях) / (курс целевой валюты в рублях)
+                // С учетом markup для целевой валюты
+                displayRate = (baseRate / targetRate) * markupMultiplier;
+                conversionString = `1 ${baseCurrency} = ${displayRate.toFixed(2)} ${meta.code}`;
+            }
+            
             return {
                 code: meta.code,
                 flag: meta.flag,
                 icon: meta.icon,
                 payoutMarkup: meta.payoutMarkup,
-                conversion: `1 ${meta.code} = ${targetRate.toFixed(2)} RUB`,
+                conversion: conversionString,
                 amount: targetAmount,
                 ready: true,
             };
@@ -93,7 +111,7 @@ const RatesBoard = ({ baseCurrency, baseAmount, rates, loading, error }: RatesBo
             <div className="rates-board__header">
            
                     <Typography.Text className="rates-board__label">
-                        Вы получаете
+                        Вы получаете 
                     </Typography.Text>
                
                 <Typography.Text className="rates-board__subtitle">
@@ -150,15 +168,16 @@ const RatesBoard = ({ baseCurrency, baseAmount, rates, loading, error }: RatesBo
                                     })()}
                                 </div>
                                 <Typography.Text className="rates-board__code">
-                                    {item.code}
+                                    {item.code} 
                                 </Typography.Text>
                             </div>
                             <div className="rates-board__right">
+                                
                                 <Typography.Text
                                     type="secondary"
                                     className="rates-board__conversion"
                                 >
-                                    {item.conversion}
+                                    {item.conversion} 
                                 </Typography.Text>
                                 <Typography.Text className="rates-board__amount">
                                     {item.ready ? formatAmount(item.amount) : '—'}

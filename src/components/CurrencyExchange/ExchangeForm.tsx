@@ -9,6 +9,7 @@ type ExchangeFormProps = {
     onCurrencyChange: (value: string) => void;
     onAmountChange: (value: number) => void;
     disabled?: boolean;
+    exchangeUrl?: string;
 };
 
 const ExchangeForm = ({
@@ -17,9 +18,20 @@ const ExchangeForm = ({
     onCurrencyChange,
     onAmountChange,
     disabled,
+    exchangeUrl,
 }: ExchangeFormProps) => {
     const currencyOptions = getCurrencyOptions();
     const currencyMetaData = getCurrencyMeta();
+    
+    const handleExchangeClick = () => {
+        if (exchangeUrl) {
+            // Добавляем параметры валюты и суммы в URL
+            const url = new URL(exchangeUrl);
+            url.searchParams.append('currency', currency);
+            url.searchParams.append('amount', amount.toString());
+            window.open(url.toString(), '_blank');
+        }
+    };
     
     const optionsWithFlags = currencyOptions.map((option) => {
         const meta = currencyMetaData[option.value];
@@ -62,7 +74,7 @@ const ExchangeForm = ({
                     popupMatchSelectWidth={200}
                     disabled={disabled}
                 />
-                <InputNumber
+                    <InputNumber
                     value={amount}
                     min={0}
                     max={1000000000000}
@@ -71,12 +83,23 @@ const ExchangeForm = ({
                     }
                     parser={(value) => Number(value?.replace(/\./g, '') || 0)}
                     onChange={(value) => onAmountChange(value ?? 0)}
+                    onKeyPress={(e) => {
+                        if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                        }
+                    }}
                     className="exchange-form__input"
                     disabled={disabled}
                     controls={false} 
                 />
             </Space.Compact>
-            <Button type="primary" size="large" className="exchange-form__button" disabled={disabled}>
+            <Button 
+                type="primary" 
+                size="large" 
+                className="exchange-form__button" 
+                disabled={disabled || !exchangeUrl}
+                onClick={handleExchangeClick}
+            >
                Обменять
             </Button>
         </div>

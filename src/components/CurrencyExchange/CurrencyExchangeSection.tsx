@@ -9,6 +9,9 @@ const CurrencyExchangeSection = () => {
     const [currency, setCurrency] = useState('RUB');
     const [amount, setAmount] = useState(10000);
     
+    // Получаем URL кнопки обмена из данных WordPress
+    const exchangeUrl = (window as any).pluginData?.exchangeButtonUrl || '';
+    
     // Используем useMemo чтобы не пересоздавать массив кодов при каждом рендере
     // Используем стабильный массив базовых валют, чтобы избежать бесконечных перезагрузок
     const rateCodes = React.useMemo(() => {
@@ -46,6 +49,7 @@ const CurrencyExchangeSection = () => {
                             onCurrencyChange={setCurrency}
                             onAmountChange={setAmount}
                             disabled={loading}
+                            exchangeUrl={exchangeUrl}
                         />
                     </div>
                     <RatesBoard
